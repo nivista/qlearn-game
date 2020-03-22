@@ -1,0 +1,50 @@
+.gridSquare {
+  border: 1px solid black;
+}
+
+.wall {
+  background-color: black;
+}
+
+.reward {
+  background-color: green;
+}
+
+.normal {
+  background-color: gray;
+}
+
+.cost {
+  background-color: red;
+}
+
+.agent::after {
+  content: "⁣☀☁";
+}
+
+.tri p {
+  position: relative;
+  left: -4px;
+  top: -8px;
+}
+.tri {
+  width: 0px;
+  height: 0px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-width: 0 30px 30px 30px;
+  position: absolute;
+}
+.right {
+  transform: translate(25%, 50%) rotate(-0.25turn);
+}
+.left {
+  transform: translate(-25%, 50%) rotate(0.25turn);
+}
+.up {
+  transform: rotate(0.5turn);
+}
+.down {
+  transform: translate(0%, 100%);
+}
