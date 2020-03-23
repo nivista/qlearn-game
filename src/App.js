@@ -1,11 +1,21 @@
 import React from "react";
+
+import {
+  COST_OF_LIVING,
+  RED_COST,
+  GREEN_REWARD,
+  DISCOUNT,
+  LEARNING_RATE,
+  ROWS,
+  COLS
+} from "./constants";
 import "./App.css";
 import Grid from "./Grid";
 import ControlPanel from "./ControlPanel";
 import RewardsList from "./RewardsList";
-const COST_OF_LIVING = -0.2;
-const GREEN_REWARD = 10;
-const RED_COST = -10;
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import Worker from "worker-loader!./worker.js";
+import { move } from "./gameLogic";
 
 class App extends React.Component {
   /*
@@ -15,7 +25,15 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     const agent = [0, 0];
-    const grid = this.initializeGrid(agent);
+    const grid = [];
+    for (let r = 1; r <= ROWS; r++) {
+      const newRow = [];
+      grid.push(newRow);
+      for (let c = 1; c <= COLS; c++) {
+        newRow.push({ type: "normal", agent: false, qVals: [0, 0, 0, 0] });
+      }
+    }
+    grid[agent[0]][agent[1]].agent = true;
     this.state = {
       grid: grid,
       mode: "play",
@@ -29,6 +47,12 @@ class App extends React.Component {
 
   componentDidMount() {
     this.focusDiv();
+    this.worker = new Worker();
+    this.worker.addEventListener("message", e => {
+      const agent = this.state.agent;
+      e.data[agent[0]][agent[1]].agent = true;
+      this.setState({ grid: e.data });
+    });
   }
 
   componentDidUpdate() {
@@ -41,141 +65,6 @@ class App extends React.Component {
   focusDiv() {
     this.myRef.current.focus();
   }
-
-  /*
-   * Creates new grid with agent in initial square
-   * Resets reward lists
-   */
-  intializeState() {
-    const agent = [0, 0];
-    const grid = this.initializeGrid(agent);
-    this.setState({
-      grid: grid,
-      mode: "play",
-      agent: agent,
-      reward: 0,
-      playRewards: [],
-      botRewards: []
-    });
-  }
-
-  /*
-   * Creates new grid with agent in starting square and all gridSquares
-   * of type normal
-   */
-  initializeGrid(agent) {
-    const grid = [];
-    for (let r = 1; r <= 5; r++) {
-      const newRow = [];
-      grid.push(newRow);
-      for (let c = 1; c <= 10; c++) {
-        newRow.push({ type: "normal", agent: false, qVals: [0, 0, 0, 0] });
-      }
-    }
-    grid[agent[0]][agent[1]].agent = true;
-    return grid;
-  }
-
-  /*
-   * given : total reward, last reward recieved, and direction agent went
-   * to hit goalState square
-   * performs q update, updates rewards list, and brings agent to initial state
-   */
-  gameOver = (totalReward, lastReward, dir) => {
-    console.log(this.state.grid);
-    let oldQ = this.locToSquare(this.state.agent).qVals[dir];
-    let newQ = lastReward;
-    let updatedQ = oldQ * 0.5 + newQ * 0.5;
-    const newGrid = this.getGridAfterMove(this.state.agent, [0, 0]);
-    newGrid[this.state.agent[0]][this.state.agent[1]].qVals[dir] = updatedQ;
-    if (this.state.mode === "play") {
-      const list = this.state.playRewards.slice();
-      list.push(totalReward);
-      this.setState({
-        playRewards: list,
-        grid: newGrid,
-        agent: [0, 0],
-        reward: 0
-      });
-    } else if (this.state.mode === "train") {
-      const list = this.state.botRewards.slice();
-      list.push(totalReward);
-      this.setState({
-        botRewards: list,
-        grid: newGrid,
-        agent: [0, 0],
-        reward: 0
-      });
-    }
-  };
-
-  /* given : nextLocation and direction agent was going
-   * calls gameOver if it was a terminal state
-   * otherwise updates state with newLoc
-   * handles qUpdates, or passes that to gameOver function
-   * returns
-   */
-  moveAgent = (nextLoc, dir) => {
-    let currReward = 0;
-    currReward += COST_OF_LIVING;
-    const currLoc = this.state.agent;
-
-    if (currLoc[0] === nextLoc[0] && currLoc[1] === nextLoc[1]) {
-      //agent didn't successfully move case
-      const newGrid = this.getGridAfterMove(currLoc, nextLoc);
-      const oldQ = this.locToSquare(currLoc).qVals[dir];
-      const newQ =
-        currReward + 0.5 * Math.max(...this.locToSquare(nextLoc).qVals);
-      const updatedQ = 0.5 * oldQ + 0.5 * newQ;
-      newGrid[currLoc[0]][currLoc[1]].qVals[dir] = updatedQ;
-      this.setState({ grid: newGrid, reward: this.state.reward + currReward });
-    } else if (this.locToSquare(nextLoc).type === "reward") {
-      currReward += GREEN_REWARD;
-      this.gameOver(this.state.reward + currReward, currReward, dir);
-    } else if (this.locToSquare(nextLoc).type === "cost") {
-      currReward += RED_COST;
-      this.gameOver(this.state.reward + currReward, currReward, dir);
-    } else {
-      const newGrid = this.getGridAfterMove(currLoc, nextLoc);
-      const oldQ = this.locToSquare(currLoc).qVals[dir];
-      const newQ =
-        currReward + 0.5 * Math.max(...this.locToSquare(nextLoc).qVals);
-      const updatedQ = 0.5 * oldQ + 0.5 * newQ;
-      newGrid[currLoc[0]][currLoc[1]].qVals[dir] = updatedQ;
-      this.setState({
-        grid: newGrid,
-        agent: nextLoc,
-        reward: this.state.reward + currReward
-      });
-    }
-  };
-
-  /*
-   * Returns true if agent can move to a location,
-   * otherwise returns false (wall or off grid)
-   */
-  canMoveAgent = loc => {
-    return (
-      loc &&
-      loc[0] >= 0 &&
-      loc[1] >= 0 &&
-      loc[0] < this.state.grid.length &&
-      loc[1] < this.state.grid[0].length &&
-      this.state.grid[loc[0]][loc[1]].type !== "wall"
-    );
-  };
-
-  /* Given an agent movement record, returns a copy of grid with those changes
-   * Partially executes deep copy to prevent mutating state
-   */
-  getGridAfterMove = (prev, next) => {
-    const newGrid = this.state.grid.slice();
-    newGrid[prev[0]] = newGrid[prev[0]].slice();
-    newGrid[next[0]] = newGrid[next[0]].slice();
-    newGrid[prev[0]][prev[1]].agent = false;
-    newGrid[next[0]][next[1]].agent = true;
-    return newGrid;
-  };
 
   /* given row/col of gridSquare, changes its type
    * (normal -> wall -> reward -> cost -> normal)
@@ -243,21 +132,34 @@ class App extends React.Component {
     if (this.state.mode === "train" || e.keyCode < 37 || e.keyCode > 40) {
       return;
     }
+    e.preventDefault();
     const row = this.state.agent[0];
     const col = this.state.agent[1];
     const oldSpot = [row, col];
     let dir = e.keyCode - 37; //37 is the key code for left
-    const newSpot = this.getNextSpot(oldSpot, dir);
-
-    this.moveAgent(newSpot, dir);
+    const { nextLoc, newQ, changeInReward, gameover } = move(
+      this.state.grid,
+      dir,
+      this.state.agent
+    );
+    this.updateState(dir, false, nextLoc, newQ, changeInReward, gameover);
   };
 
-  reset = () => {};
+  /* if applicable, changes mode
+   * stops all intervals and workers
+   * if the mode is "train" initializes botInterval
+   * if the mode is "both" tells worker to train in the background
+   */
   setMode = mode => {
     if (this.state.mode === mode) return;
     clearInterval(this.state.botInterval);
     if (mode === "train") {
-      var botInterval = setInterval(this.botMove, 1);
+      var botInterval = setInterval(this.botMove, 10);
+    } else if (mode == "both") {
+      this.worker.postMessage({
+        grid: this.state.grid,
+        agent: this.state.agent
+      });
     }
     //set interval for doing training move if
     this.setState({ mode: mode, botInterval: botInterval });
@@ -269,7 +171,8 @@ class App extends React.Component {
   botMove = () => {
     if (Math.random() < 0.8) {
       //pick best move
-      let square = this.locToSquare(this.state.agent);
+      let square = this.state.grid[this.state.agent[0]][this.state.agent[1]];
+
       let max = Math.max(...square.qVals);
       let options = [];
       square.qVals.forEach((val, i) => {
@@ -278,19 +181,44 @@ class App extends React.Component {
         }
       });
       var dir = options[Math.floor(Math.random() * options.length)];
-      console.log(options);
-      console.log(dir);
     } else {
       //move randomly
       var dir = Math.floor(Math.random() * 4);
     }
-    let nextSpot = this.getNextSpot(this.state.agent, dir);
-    this.moveAgent(nextSpot, dir);
+    const { nextLoc, newQ, changeInReward, gameover } = move(
+      this.state.grid,
+      dir,
+      this.state.agent
+    );
+    this.updateState(dir, true, nextLoc, newQ, changeInReward, gameover);
   };
 
-  //given a location, returns the relevant grid square
-  locToSquare = loc => {
-    return this.state.grid[loc[0]][loc[1]];
+  updateState = (intendedDir, bot, nextLoc, newQ, changeInReward, gameover) => {
+    const grid = this.state.grid.slice();
+    grid[this.state.agent[0]] = grid[this.state.agent[0]].slice();
+    grid[nextLoc[0]] = grid[nextLoc[0]].slice();
+
+    //update qVals
+    grid[this.state.agent[0]][this.state.agent[1]].qVals[intendedDir] = newQ;
+    //move agent
+    grid[this.state.agent[0]][this.state.agent[1]].agent = false;
+    grid[nextLoc[0]][nextLoc[1]].agent = true;
+    //change rewards
+    let reward = this.state.reward + changeInReward;
+    if (gameover && bot) {
+      //update rewards lists if game is over
+      const rewardsList = this.state.botRewards.slice();
+      rewardsList.push(reward);
+      this.setState({ botRewards: rewardsList });
+      reward = 0; //reset reward
+    } else if (gameover) {
+      const rewardsList = this.state.playRewards.slice();
+      rewardsList.push(reward);
+      this.setState({ playRewards: rewardsList });
+      reward = 0; //reset reward
+    }
+
+    this.setState({ reward, grid, agent: nextLoc });
   };
 
   render() {
@@ -305,7 +233,6 @@ class App extends React.Component {
           setMode={this.setMode}
           mode={this.state.mode}
           reward={this.state.reward}
-          reset={this.reset}
         />
         <Grid data={this.state.grid} switchType={this.switchType} />
         <RewardsList title="Play Rewards" rewards={this.state.playRewards} />
