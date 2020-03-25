@@ -1,13 +1,11 @@
 import React from "react";
 
 import {
-  COST_OF_LIVING,
-  RED_COST,
-  GREEN_REWARD,
-  DISCOUNT,
-  LEARNING_RATE,
+  COST_OF_LIVING_DEFAULT,
+  FAIL_RATE_DEFAULT,
   ROWS,
-  COLS
+  COLS,
+  MODES
 } from "./constants";
 import "./App.css";
 import Grid from "./Grid";
@@ -30,17 +28,23 @@ class App extends React.Component {
       const newRow = [];
       grid.push(newRow);
       for (let c = 1; c <= COLS; c++) {
-        newRow.push({ type: "normal", agent: false, qVals: [0, 0, 0, 0] });
+        newRow.push({
+          type: "normal",
+          agent: false,
+          qVals: [0, 0, 0, 0]
+        });
       }
     }
     grid[agent[0]][agent[1]].agent = true;
     this.state = {
       grid: grid,
-      mode: "play",
+      mode: MODES.HUMAN_PLAY,
       agent: agent,
       reward: 0,
       playRewards: [],
-      botRewards: []
+      botRewards: [],
+      costOfLiving: COST_OF_LIVING_DEFAULT,
+      failRate: FAIL_RATE_DEFAULT
     };
     this.myRef = React.createRef();
   }
@@ -55,16 +59,12 @@ class App extends React.Component {
     });
   }
 
-  componentDidUpdate() {
-    this.focusDiv();
-  }
-
   /*
    * Focuses on main app div
    */
-  focusDiv() {
+  focusDiv = () => {
     this.myRef.current.focus();
-  }
+  };
 
   /* given row/col of gridSquare, changes its type
    * (normal -> wall -> reward -> cost -> normal)
@@ -90,46 +90,16 @@ class App extends React.Component {
     this.setState({ grid: newGrid });
   };
 
-  /* Given old spot and intended direction, returns new spot coords
-   * 5% chance of going clockwise of intended direction, 5% chance of
-   * going counter clockwise, 90% of going in intended direction
-   */
-  getNextSpot = (oldSpot, dir) => {
-    const rand = Math.random();
-    if (rand < 0.05) {
-      dir++;
-    } else if (rand < 0.1) {
-      dir--;
-    }
-    dir = dir % 4;
-    const newSpot = oldSpot.slice();
-    switch (dir) {
-      case 0: // left
-        newSpot[1]--;
-        break;
-      case 1: // up
-        newSpot[0]--;
-        break;
-      case 2: // right
-        newSpot[1]++;
-        break;
-      case 3: // down
-        newSpot[0]++;
-        break;
-      default:
-    }
-    if (!this.canMoveAgent(newSpot)) {
-      return oldSpot;
-    }
-    return newSpot;
-  };
-
   /* Does nothing if mode === "train" or arrow keys weren't pressed
    * calls moveagent with direction given by arrowkeys and newspot Given
    * by getNextSpot
    */
   handleKeyDown = e => {
-    if (this.state.mode === "train" || e.keyCode < 37 || e.keyCode > 40) {
+    if (
+      this.state.mode !== MODES.HUMAN_PLAY ||
+      e.keyCode < 37 ||
+      e.keyCode > 40
+    ) {
       return;
     }
     e.preventDefault();
@@ -140,7 +110,9 @@ class App extends React.Component {
     const { nextLoc, newQ, changeInReward, gameover } = move(
       this.state.grid,
       dir,
-      this.state.agent
+      this.state.agent,
+      this.state.costOfLiving,
+      this.state.failRate
     );
     this.updateState(dir, false, nextLoc, newQ, changeInReward, gameover);
   };
@@ -153,13 +125,9 @@ class App extends React.Component {
   setMode = mode => {
     if (this.state.mode === mode) return;
     clearInterval(this.state.botInterval);
-    if (mode === "train") {
+    console.log(mode);
+    if (mode !== MODES.HUMAN_PLAY) {
       var botInterval = setInterval(this.botMove, 10);
-    } else if (mode == "both") {
-      this.worker.postMessage({
-        grid: this.state.grid,
-        agent: this.state.agent
-      });
     }
     //set interval for doing training move if
     this.setState({ mode: mode, botInterval: botInterval });
@@ -169,10 +137,9 @@ class App extends React.Component {
    * updates q values
    */
   botMove = () => {
-    if (Math.random() < 0.8) {
-      //pick best move
+    if (Math.random() < 0.8 || this.state.mode === MODES.BOT_PLAY) {
+      // best move
       let square = this.state.grid[this.state.agent[0]][this.state.agent[1]];
-
       let max = Math.max(...square.qVals);
       let options = [];
       square.qVals.forEach((val, i) => {
@@ -182,13 +149,15 @@ class App extends React.Component {
       });
       var dir = options[Math.floor(Math.random() * options.length)];
     } else {
-      //move randomly
+      // explore
       var dir = Math.floor(Math.random() * 4);
     }
     const { nextLoc, newQ, changeInReward, gameover } = move(
       this.state.grid,
       dir,
-      this.state.agent
+      this.state.agent,
+      this.state.costOfLiving,
+      this.state.failRate
     );
     this.updateState(dir, true, nextLoc, newQ, changeInReward, gameover);
   };
@@ -220,21 +189,44 @@ class App extends React.Component {
 
     this.setState({ reward, grid, agent: nextLoc });
   };
-
+  updateCostOfLiving = e => {
+    let val = parseFloat(e.target.value);
+    if (!isNaN(val) && val <= 0 && val >= -10)
+      this.setState({ costOfLiving: val });
+  };
+  updateFailRate = e => {
+    let val = parseFloat(e.target.value);
+    if (!isNaN(val) && val >= 0 && val <= 1) {
+      this.setState({ failRate: val });
+    }
+  };
+  trainAsync = () => {
+    this.worker.postMessage({
+      grid: this.state.grid,
+      agent: this.state.agent,
+      costOfLiving: this.state.costOfLiving,
+      failRate: this.state.failRate
+    });
+  };
   render() {
     return (
-      <div
-        className="App"
-        onKeyDown={this.handleKeyDown}
-        tabIndex={0}
-        ref={this.myRef}
-      >
+      <div className="App" tabIndex={0} onClickCapture={this.focusDiv}>
         <ControlPanel
           setMode={this.setMode}
           mode={this.state.mode}
           reward={this.state.reward}
+          costOfLiving={this.state.costOfLiving}
+          updateCostOfLiving={this.updateCostOfLiving}
+          failRate={this.state.failRate}
+          updateFailRate={this.updateFailRate}
+          trainAsync={this.trainAsync}
         />
-        <Grid data={this.state.grid} switchType={this.switchType} />
+        <Grid
+          data={this.state.grid}
+          switchType={this.switchType}
+          aRef={this.myRef}
+          keyDownFunc={this.handleKeyDown}
+        />
         <RewardsList title="Play Rewards" rewards={this.state.playRewards} />
         <RewardsList title="Bot Rewards" rewards={this.state.botRewards} />
       </div>

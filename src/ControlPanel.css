@@ -1,5 +1,5 @@
 #controlPanel {
-  margin: 50px auto;
+  background-color: lightblue;
 }
 .button {
   background-color: #656eab;
@@ -11,4 +11,34 @@
 }
 .selected {
   background-color: #1d2ea1;
+}
+
+input:invalid {
+  background-color: pink;
+}
+
+button {
+  border: none;
+  padding: 10px 20px;
+  font-size: 15px;
+  text-decoration: none;
+  background: blue;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  margin: 10px 0px;
+}
+
+button:hover {
+  background: #0053ba;
+}
+
+input {
+  margin: 10px;
+  border: none;
+  padding: 5px;
+  border-radius: 2px;
+}
+label {
+  margin: 5px;
 }

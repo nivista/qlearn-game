@@ -1,7 +1,8 @@
 import React from "react";
 import "./GridSquare.css";
+import { DISPLAY_Q_VALUES } from "./constants";
+
 function GridSquare(props) {
-  const DISPLAY_Q_VALUES = true;
   const col = props.col + 1; //array index to grid index
   const row = props.row + 1;
   const style = {

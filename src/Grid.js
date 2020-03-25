@@ -29,7 +29,13 @@ function Grid(props) {
       .flat();
   });
   return (
-    <div className="grid" style={style}>
+    <div
+      className="grid"
+      style={style}
+      ref={props.aRef}
+      onKeyDown={props.keyDownFunc}
+      tabIndex={0}
+    >
       {gridElements}
     </div>
   );

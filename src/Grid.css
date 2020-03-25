@@ -1,4 +1,6 @@
-.grid{
+.grid {
   display: grid;
-  justify-content: center;
+  width: max-content;
+  margin: 5px auto;
+  padding: 20px;
 }

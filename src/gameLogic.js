@@ -1,18 +1,11 @@
-import {
-  COST_OF_LIVING,
-  RED_COST,
-  GREEN_REWARD,
-  DISCOUNT,
-  LEARNING_RATE,
-  FAIL_RATE
-} from "./constants";
+import { RED_COST, GREEN_REWARD, DISCOUNT, LEARNING_RATE } from "./constants";
 
-export const move = (grid, intendedDir, agentLoc) => {
+export const move = (grid, intendedDir, agentLoc, costOfLiving, failRate) => {
   const rand = Math.random();
   let dir = intendedDir;
-  if (rand < FAIL_RATE / 2) {
+  if (rand < failRate / 2) {
     dir++;
-  } else if (rand < FAIL_RATE) {
+  } else if (rand < failRate) {
     dir--;
   }
   dir = dir % 4;
@@ -44,7 +37,7 @@ export const move = (grid, intendedDir, agentLoc) => {
     nextLoc = agentLoc; // bring back to previous spot
   }
 
-  let changeInReward = COST_OF_LIVING;
+  let changeInReward = costOfLiving;
   let nextLocReward;
   let nextType = grid[nextLoc[0]][nextLoc[1]].type;
   let gameover = false;
@@ -77,6 +70,5 @@ export const move = (grid, intendedDir, agentLoc) => {
 
   const proposedQ = changeInReward + (1 - DISCOUNT) * nextLocReward;
   const newQ = prevQ * (1 - LEARNING_RATE) + proposedQ * LEARNING_RATE;
-
   return { nextLoc, newQ, changeInReward, gameover };
 };
