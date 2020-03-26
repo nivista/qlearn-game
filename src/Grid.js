@@ -48,6 +48,7 @@ function Grid(props) {
         }}
         title="Bot Rewards History"
         data={props.rewardsData}
+        resetRewards={props.resetRewards}
       />
       <p
         style={{

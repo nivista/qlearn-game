@@ -37,46 +37,75 @@ class ControlPanel extends React.Component {
             </button>
           ))}
           <div style={{ width: "10px", display: "inline-block" }} />
-          <button onClick={this.props.trainAsync}>Train Asynchronously</button>
-          <br />
-          <label>Cost of Living: </label>
-          <input
-            value={this.state.costOfLiving}
-            onChange={this.updateCostOfLiving}
-            max={0}
-            min={-10}
-            step={0.1}
-            type="number"
-            ref={this.colRef}
-            onClick={() => this.colRef.current.focus()}
-          ></input>
-          <br />
-          <label>Fail Rate: </label>
-          <input
-            value={this.state.failRate}
-            onChange={this.updateFailRate}
-            min={0}
-            max={1}
-            type="number"
-            step={0.1}
-            ref={this.failRef}
-            onClick={() => this.failRef.current.focus()}
-          ></input>
-          <br />
+          <button
+            onClick={this.props.trainAsync}
+            className={this.props.workingAsync ? "training" : ""}
+          >
+            Train Asynchronously
+          </button>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <label>Cost of Living: </label>
+                </td>
+                <td>
+                  <input
+                    value={this.state.costOfLiving}
+                    onChange={this.updateCostOfLiving}
+                    max={0}
+                    min={-10}
+                    step={0.1}
+                    type="number"
+                    ref={this.colRef}
+                    onClick={() => this.colRef.current.focus()}
+                  ></input>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Fail Rate: </label>
+                </td>
+
+                <td>
+                  <input
+                    value={this.state.failRate}
+                    onChange={this.updateFailRate}
+                    min={0}
+                    max={1}
+                    type="number"
+                    step={0.1}
+                    ref={this.failRef}
+                    onClick={() => this.failRef.current.focus()}
+                  ></input>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <ol>
-          <li>Left click to edit board</li>
-          <li>Use arrow keys to move agent</li>
+          <li>Use arrow keys to move the agent</li>
           <li>
             The "Fail Rate" will determine the likelihood of the agent moving
             unexpectedly
           </li>
-          <li>Collect "Cost of Living" reward with every move</li>
-          <li>Collect +10 reward for running into a green "end state"</li>
-          <li>Collect -10 reward for running into a red "end state"</li>
+          <li>Lose "Cost of Living" reward with every move</li>
+          <li>Left click to edit the board</li>
           <li>
-            See how the bot does, and read more about&nbsp;
-            <a href="https://en.wikipedia.org/wiki/Q-learning">Q-Learning</a>!
+            You can't run into <span>black</span> walls
+          </li>
+          <li>
+            Gain 10 reward for running into a{" "}
+            <span style={{ color: "green" }}>green</span> "end state" and
+            restart
+          </li>
+          <li>
+            Lose 10 reward for running into a{" "}
+            <span style={{ color: "red" }}>red</span> "end state" and restart
+          </li>
+          <li>
+            See how the bot does, and
+            <a href="github.com/nivista/qlearn-game">read more</a>!
           </li>
         </ol>
       </div>

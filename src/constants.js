@@ -1,8 +1,8 @@
 export const COST_OF_LIVING_DEFAULT = -0.2;
 export const GREEN_REWARD = 10;
 export const RED_COST = -10;
-export const DISCOUNT = 0.001;
-export const LEARNING_RATE = 0.001;
+export const DISCOUNT = 0.01;
+export const LEARNING_RATE = 0.1;
 export const FAIL_RATE_DEFAULT = 0.1;
 export const ROWS = 5;
 export const COLS = 10;

@@ -83,9 +83,9 @@ export const move = (grid, intendedDir, agentLoc, costOfLiving, failRate) => {
  * Otherwise returns a random move
  */
 export function chooseMove(grid, agent, exploitProb) {
+  let square = grid[agent[0]][agent[1]];
   if (Math.random() < exploitProb) {
     // best move
-    let square = grid[agent[0]][agent[1]];
     let max = Math.max(...square.qVals);
     let options = [];
 
@@ -96,7 +96,13 @@ export function chooseMove(grid, agent, exploitProb) {
     });
     return options[Math.floor(Math.random() * options.length)];
   } else {
-    // explore
-    return Math.floor(Math.random() * 4);
+    // return the direction with the smallest count, ie number of times tried
+    return [0, 1, 2, 3].reduce(
+      ([bestDir, smallest], dir) =>
+        smallest < square.counts[dir]
+          ? [bestDir, smallest]
+          : [dir, square.counts[dir]],
+      [-1, Math.inf]
+    )[0];
   }
 }

@@ -24,6 +24,7 @@ onmessage = e => {
     );
 
     grid[agent[0]][agent[1]].qVals[intendedDir] = newQ;
+    grid[agent[0]][agent[1]].counts[intendedDir]++;
     agent = nextLoc;
   }
 

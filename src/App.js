@@ -27,7 +27,8 @@ class App extends React.Component {
         newRow.push({
           type: "normal",
           agent: false,
-          qVals: [0, 0, 0, 0]
+          qVals: [0, 0, 0, 0],
+          counts: [0, 0, 0, 0]
         });
       }
     }
@@ -40,7 +41,8 @@ class App extends React.Component {
       lastReward: "_",
       botRewards: [],
       costOfLiving: COST_OF_LIVING_DEFAULT,
-      failRate: FAIL_RATE_DEFAULT
+      failRate: FAIL_RATE_DEFAULT,
+      workingAsync: false
     };
     this.myRef = React.createRef();
   }
@@ -49,15 +51,21 @@ class App extends React.Component {
     this.focusDiv();
     this.worker = new Worker();
     this.worker.addEventListener("message", e => {
+      this.setState({ workingAsync: false });
       const agent = this.state.agent;
       e.data[agent[0]][agent[1]].agent = true;
+      for (let r = 0; r < e.data.length; r++) {
+        for (let c = 0; c < e.data[0].length; c++) {
+          e.data[r][c].type = this.state.grid[r][c].type;
+        }
+      }
       this.setState({ grid: e.data });
     });
   }
 
   // focuses on grid
   focusDiv = () => {
-    this.myRef.current.focus();
+    this.myRef.current.focus({ preventScroll: true });
   };
 
   // given row/col of gridSquare, changes its type
@@ -113,7 +121,7 @@ class App extends React.Component {
     clearInterval(this.state.botInterval);
     let botInterval = null;
     if (mode === MODES.BOT_TRAIN) {
-      botInterval = setInterval(this.botMove, 50);
+      botInterval = setInterval(this.botMove, 10);
     } else if (mode === MODES.BOT_PLAY) {
       botInterval = setInterval(this.botMove, 150);
     }
@@ -138,15 +146,29 @@ class App extends React.Component {
     this.updateState(dir, nextLoc, newQ, changeInReward, gameover);
   };
 
+  // Updates state after a move given intendedDir (0-3), nextLoc ([row, col])
+  //newQ (number), changeInReward (number), gameover (boolean)
   updateState = (intendedDir, nextLoc, newQ, changeInReward, gameover) => {
     const grid = this.state.grid.slice();
     grid[this.state.agent[0]] = grid[this.state.agent[0]].slice();
     grid[nextLoc[0]] = grid[nextLoc[0]].slice();
 
+    let currGridSquare = {};
+    grid[this.state.agent[0]][this.state.agent[1]] = Object.assign(
+      currGridSquare,
+      grid[this.state.agent[0]][this.state.agent[1]]
+    );
+    grid[this.state.agent[0]][this.state.agent[1]] = currGridSquare;
     //update qVals
-    grid[this.state.agent[0]][this.state.agent[1]].qVals[intendedDir] = newQ;
+    currGridSquare.qVals = currGridSquare.qVals.slice();
+    currGridSquare.qVals[intendedDir] = newQ;
+
+    //update counts
+    currGridSquare.counts = currGridSquare.counts.slice();
+    currGridSquare.counts[intendedDir]++;
+
     //move agent
-    grid[this.state.agent[0]][this.state.agent[1]].agent = false;
+    currGridSquare.agent = false;
     grid[nextLoc[0]][nextLoc[1]].agent = true;
     //change rewards
     let reward = this.state.reward + changeInReward;
@@ -168,18 +190,22 @@ class App extends React.Component {
       agent: nextLoc
     });
   };
+
   updateCostOfLiving = e => {
     let val = parseFloat(e.target.value);
     if (!isNaN(val) && val <= 0 && val >= -10)
       this.setState({ costOfLiving: val });
   };
+
   updateFailRate = e => {
     let val = parseFloat(e.target.value);
     if (!isNaN(val) && val >= 0 && val <= 1) {
       this.setState({ failRate: val });
     }
   };
+
   trainAsync = () => {
+    this.setState({ workingAsync: true });
     this.worker.postMessage({
       grid: this.state.grid,
       agent: this.state.agent,
@@ -187,6 +213,7 @@ class App extends React.Component {
       failRate: this.state.failRate
     });
   };
+
   render() {
     return (
       <div className="App" tabIndex={0} onClickCapture={this.focusDiv}>
@@ -198,6 +225,7 @@ class App extends React.Component {
           failRate={this.state.failRate}
           updateFailRate={this.updateFailRate}
           trainAsync={this.trainAsync}
+          workingAsync={this.state.workingAsync}
         />
         <Grid
           data={this.state.grid}
@@ -207,6 +235,7 @@ class App extends React.Component {
           keyDownFunc={this.handleKeyDown}
           currReward={this.state.reward}
           lastReward={this.state.lastReward}
+          resetRewards={() => this.setState({ botRewards: [] })}
         />
       </div>
     );

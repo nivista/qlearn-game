@@ -1,68 +1,19 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Welcome to QLearn
 
-## Available Scripts
+QLearn is a game that that can be controlled by an AI trained with Q-learning
 
-In the project directory, you can run:
+### What is Q-learning?
 
-### `npm start`
+Q-learning is a reinforcement learning algorithm where an agent gets progressively better approximations of the expected reward from taking particular actions through trial and error. It operates in a [Markov Decision Process](https://en.wikipedia.org/wiki/Markov_decision_process) where not all the reward and transition functions are known.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### What can Reinforcement Learning be used for?
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Check out this Medium [article](https://towardsdatascience.com/applications-of-reinforcement-learning-in-real-world-1a94955bcd12).
 
-### `npm test`
+### What technologies were used in this project?
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This is a React.JS project bootstrapped with create-react-app. It used web workers to train the bot asynchronously. It also used refs to manage focus, and [Recharts](http://recharts.org/) for the graph.
 
-### `npm run build`
+### Tips for enjoying the game
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Think about how in certain maps the agent will have to make trade offs between risk and reward, and try to make the decision tough! Going past a red end state is risky because depending on the Fail Rate the agent might accidently go into it. On the other hand, if the agent can reach a green end state quickly then he accumulates minimal cost of living, increasing the total reward at the end. See how it makes progress training normally, and see how much of a boost Train Asynchronously can give. Have fun!

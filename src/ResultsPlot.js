@@ -1,12 +1,15 @@
 import React from "react";
 import { LineChart, Line, YAxis } from "recharts";
-
+import "./ResultsPlot.css";
 export default function ResultsPlot(props) {
   const { data, title, style } = props;
 
   return (
     <div style={{ ...style, textAlign: "center" }}>
-      <h3>{title}</h3>
+      <span class="title">{title}</span>
+      <button class="reset" onClick={props.resetRewards}>
+        Reset
+      </button>
       <LineChart
         width={400}
         height={200}

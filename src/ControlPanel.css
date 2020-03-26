@@ -4,14 +4,11 @@
   display: flex;
   justify-content: space-between;
 }
-.button {
-  background-color: #656eab;
-  display: inline-block;
-  margin: 10px;
-  padding: 5px 15px;
-  border-radius: 5px;
-  box-shadow: 10px 5px 5px #000b54;
+
+#controlPanel > div {
+  width: 50%;
 }
+
 .selected {
   background-color: #1d2ea1;
 }
@@ -35,18 +32,25 @@ button {
 button:hover {
   background: #0053ba;
 }
+
 button:active {
   transform: scale(0.99);
 }
+
 input {
-  margin: 10px;
   border: none;
   padding: 5px;
   border-radius: 2px;
 }
+
+table {
+  border-spacing: 10px;
+}
+
 label {
   margin: 5px 0px;
 }
+
 ol {
   padding: 0px 0px 0px 40px;
   box-shadow: 100px green;
@@ -55,6 +59,7 @@ ol {
 a:hover {
   background-color: white;
 }
+
 a,
 a:visited {
   color: #111111;
@@ -63,4 +68,12 @@ a:visited {
   text-decoration: none;
   padding: 2px;
   border-radius: 4px;
+}
+
+.training {
+  opacity: 50%;
+}
+
+li span {
+  font-weight: bolder;
 }

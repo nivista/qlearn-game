@@ -1,6 +1,7 @@
 import React from "react";
 import "./GridSquare.css";
 import { DISPLAY_Q_VALUES } from "./constants";
+import AgentPicture from "./stickfigure.png";
 
 function GridSquare(props) {
   const col = props.col + 1; //array index to grid index
@@ -13,6 +14,7 @@ function GridSquare(props) {
   };
   const agent = props.data.agent ? " agent" : "";
   const start = col === 1 && row === 1 ? " start" : "";
+  console.log();
   return (
     <div
       onClick={props.switch}
@@ -35,6 +37,7 @@ function GridSquare(props) {
           </div>
         </>
       ) : null}
+      {props.data.agent ? <img src={AgentPicture} /> : null}
     </div>
   );
 }
