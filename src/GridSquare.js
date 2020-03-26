@@ -12,11 +12,12 @@ function GridSquare(props) {
     gridRowEnd: row + 1
   };
   const agent = props.data.agent ? " agent" : "";
+  const start = col === 1 && row === 1 ? " start" : "";
   return (
     <div
       onClick={props.switch}
       style={style}
-      className={"gridSquare " + props.data.type + agent}
+      className={"gridSquare " + props.data.type + agent + start}
     >
       {DISPLAY_Q_VALUES ? (
         <>

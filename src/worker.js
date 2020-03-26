@@ -1,10 +1,3 @@
-import {
-  COST_OF_LIVING,
-  RED_COST,
-  GREEN_REWARD,
-  DISCOUNT,
-  LEARNING_RATE
-} from "./constants";
 import { move } from "./gameLogic";
 onmessage = e => {
   if (!e) return;
@@ -14,10 +7,25 @@ onmessage = e => {
   //so get rid of it
   grid[agent[0]][agent[1]].agent = false;
   //iterate
-  for (let i = 0; i < 1000000; i++) {
+  for (let i = 0; i < 10000000; i++) {
     //select move, given a grid and agent location
-    const intendedDir = Math.floor(Math.random() * 4);
+    let intendedDir;
+    if (Math.random() < 0.8) {
+      // best move
+      let square = grid[agent[0]][agent[1]];
+      let max = Math.max(...square.qVals);
+      let options = [];
 
+      square.qVals.forEach((val, i) => {
+        if (val === max) {
+          options.push(i);
+        }
+      });
+      intendedDir = options[Math.floor(Math.random() * options.length)];
+    } else {
+      // explore
+      intendedDir = Math.floor(Math.random() * 4);
+    }
     const { nextLoc, newQ } = move(
       grid,
       intendedDir,

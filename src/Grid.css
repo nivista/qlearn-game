@@ -1,6 +1,7 @@
 .grid {
-  display: grid;
+  display: inline-grid;
   width: max-content;
-  margin: 5px auto;
+  margin: 5px 0px;
   padding: 20px;
+  float: left;
 }

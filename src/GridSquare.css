@@ -21,7 +21,10 @@
 .agent::after {
   content: "⁣☀☁";
 }
-
+.agent,
+.start {
+  pointer-events: none;
+}
 .tri p {
   position: relative;
   left: -4px;

@@ -10,7 +10,6 @@ import {
 import "./App.css";
 import Grid from "./Grid";
 import ControlPanel from "./ControlPanel";
-import RewardsList from "./RewardsList";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import Worker from "worker-loader!./worker.js";
 import { move } from "./gameLogic";
@@ -41,7 +40,7 @@ class App extends React.Component {
       mode: MODES.HUMAN_PLAY,
       agent: agent,
       reward: 0,
-      playRewards: [],
+      lastReward: "_",
       botRewards: [],
       costOfLiving: COST_OF_LIVING_DEFAULT,
       failRate: FAIL_RATE_DEFAULT
@@ -103,9 +102,6 @@ class App extends React.Component {
       return;
     }
     e.preventDefault();
-    const row = this.state.agent[0];
-    const col = this.state.agent[1];
-    const oldSpot = [row, col];
     let dir = e.keyCode - 37; //37 is the key code for left
     const { nextLoc, newQ, changeInReward, gameover } = move(
       this.state.grid,
@@ -114,7 +110,7 @@ class App extends React.Component {
       this.state.costOfLiving,
       this.state.failRate
     );
-    this.updateState(dir, false, nextLoc, newQ, changeInReward, gameover);
+    this.updateState(dir, nextLoc, newQ, changeInReward, gameover);
   };
 
   /* if applicable, changes mode
@@ -125,10 +121,13 @@ class App extends React.Component {
   setMode = mode => {
     if (this.state.mode === mode) return;
     clearInterval(this.state.botInterval);
-    console.log(mode);
-    if (mode !== MODES.HUMAN_PLAY) {
-      var botInterval = setInterval(this.botMove, 10);
+    let botInterval = null;
+    if (mode === MODES.BOT_TRAIN) {
+      botInterval = setInterval(this.botMove, 50);
+    } else if (mode === MODES.BOT_PLAY) {
+      botInterval = setInterval(this.botMove, 150);
     }
+
     //set interval for doing training move if
     this.setState({ mode: mode, botInterval: botInterval });
   };
@@ -137,20 +136,22 @@ class App extends React.Component {
    * updates q values
    */
   botMove = () => {
+    let dir;
     if (Math.random() < 0.8 || this.state.mode === MODES.BOT_PLAY) {
       // best move
       let square = this.state.grid[this.state.agent[0]][this.state.agent[1]];
       let max = Math.max(...square.qVals);
       let options = [];
+
       square.qVals.forEach((val, i) => {
         if (val === max) {
           options.push(i);
         }
       });
-      var dir = options[Math.floor(Math.random() * options.length)];
+      dir = options[Math.floor(Math.random() * options.length)];
     } else {
       // explore
-      var dir = Math.floor(Math.random() * 4);
+      dir = Math.floor(Math.random() * 4);
     }
     const { nextLoc, newQ, changeInReward, gameover } = move(
       this.state.grid,
@@ -159,10 +160,10 @@ class App extends React.Component {
       this.state.costOfLiving,
       this.state.failRate
     );
-    this.updateState(dir, true, nextLoc, newQ, changeInReward, gameover);
+    this.updateState(dir, nextLoc, newQ, changeInReward, gameover);
   };
 
-  updateState = (intendedDir, bot, nextLoc, newQ, changeInReward, gameover) => {
+  updateState = (intendedDir, nextLoc, newQ, changeInReward, gameover) => {
     const grid = this.state.grid.slice();
     grid[this.state.agent[0]] = grid[this.state.agent[0]].slice();
     grid[nextLoc[0]] = grid[nextLoc[0]].slice();
@@ -174,20 +175,23 @@ class App extends React.Component {
     grid[nextLoc[0]][nextLoc[1]].agent = true;
     //change rewards
     let reward = this.state.reward + changeInReward;
-    if (gameover && bot) {
-      //update rewards lists if game is over
+    let lastReward = this.state.lastReward;
+    if (gameover && this.state.mode !== MODES.HUMAN_PLAY) {
       const rewardsList = this.state.botRewards.slice();
       rewardsList.push(reward);
       this.setState({ botRewards: rewardsList });
-      reward = 0; //reset reward
-    } else if (gameover) {
-      const rewardsList = this.state.playRewards.slice();
-      rewardsList.push(reward);
-      this.setState({ playRewards: rewardsList });
+    }
+    if (gameover) {
+      lastReward = reward;
       reward = 0; //reset reward
     }
 
-    this.setState({ reward, grid, agent: nextLoc });
+    this.setState({
+      reward,
+      grid,
+      lastReward,
+      agent: nextLoc
+    });
   };
   updateCostOfLiving = e => {
     let val = parseFloat(e.target.value);
@@ -214,7 +218,6 @@ class App extends React.Component {
         <ControlPanel
           setMode={this.setMode}
           mode={this.state.mode}
-          reward={this.state.reward}
           costOfLiving={this.state.costOfLiving}
           updateCostOfLiving={this.updateCostOfLiving}
           failRate={this.state.failRate}
@@ -223,12 +226,13 @@ class App extends React.Component {
         />
         <Grid
           data={this.state.grid}
+          rewardsData={this.state.botRewards}
           switchType={this.switchType}
           aRef={this.myRef}
           keyDownFunc={this.handleKeyDown}
+          currReward={this.state.reward}
+          lastReward={this.state.lastReward}
         />
-        <RewardsList title="Play Rewards" rewards={this.state.playRewards} />
-        <RewardsList title="Bot Rewards" rewards={this.state.botRewards} />
       </div>
     );
   }

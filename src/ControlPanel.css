@@ -1,5 +1,8 @@
 #controlPanel {
   background-color: lightblue;
+  padding: 15px 30px 10px 15px;
+  display: flex;
+  justify-content: space-between;
 }
 .button {
   background-color: #656eab;
@@ -32,7 +35,9 @@ button {
 button:hover {
   background: #0053ba;
 }
-
+button:active {
+  transform: scale(0.99);
+}
 input {
   margin: 10px;
   border: none;
@@ -40,5 +45,22 @@ input {
   border-radius: 2px;
 }
 label {
-  margin: 5px;
+  margin: 5px 0px;
+}
+ol {
+  padding: 0px 0px 0px 40px;
+  box-shadow: 100px green;
+}
+
+a:hover {
+  background-color: white;
+}
+a,
+a:visited {
+  color: #111111;
+  border-bottom: 0.1em solid white;
+  transition: background-color 0.2s ease-in-out;
+  text-decoration: none;
+  padding: 2px;
+  border-radius: 4px;
 }

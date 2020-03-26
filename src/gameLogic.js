@@ -27,7 +27,6 @@ export const move = (grid, intendedDir, agentLoc, costOfLiving, failRate) => {
     default:
   }
 
-  //find next square and reward, given a grid, agent location, and newLoc
   if (
     nextLoc[0] < 0 ||
     nextLoc[0] >= grid.length ||
