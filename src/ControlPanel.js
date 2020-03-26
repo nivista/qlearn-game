@@ -105,7 +105,10 @@ class ControlPanel extends React.Component {
           </li>
           <li>
             See how the bot does, and
-            <a href="github.com/nivista/qlearn-game">read more</a>!
+            <a href="http://github.com/nivista/qlearn-game" target="_blank">
+              read more
+            </a>
+            !
           </li>
         </ol>
       </div>
