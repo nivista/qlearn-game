@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/qlearn-game/static/css/main.63c2ddc7.chunk.css",
+    "main.js": "/qlearn-game/static/js/main.f0dcfa54.chunk.js",
+    "main.js.map": "/qlearn-game/static/js/main.f0dcfa54.chunk.js.map",
+    "runtime-main.js": "/qlearn-game/static/js/runtime-main.8c624cbb.js",
+    "runtime-main.js.map": "/qlearn-game/static/js/runtime-main.8c624cbb.js.map",
+    "static/js/2.49cb56b5.chunk.js": "/qlearn-game/static/js/2.49cb56b5.chunk.js",
+    "static/js/2.49cb56b5.chunk.js.map": "/qlearn-game/static/js/2.49cb56b5.chunk.js.map",
+    "cfb6bf3bdc9c9c886b7f.worker.js": "/qlearn-game/cfb6bf3bdc9c9c886b7f.worker.js",
+    "cfb6bf3bdc9c9c886b7f.worker.js.map": "/qlearn-game/cfb6bf3bdc9c9c886b7f.worker.js.map",
+    "index.html": "/qlearn-game/index.html",
+    "precache-manifest.ea56341336364b93014a755c68f558e0.js": "/qlearn-game/precache-manifest.ea56341336364b93014a755c68f558e0.js",
+    "service-worker.js": "/qlearn-game/service-worker.js",
+    "static/css/main.63c2ddc7.chunk.css.map": "/qlearn-game/static/css/main.63c2ddc7.chunk.css.map",
+    "static/js/2.49cb56b5.chunk.js.LICENSE.txt": "/qlearn-game/static/js/2.49cb56b5.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.8c624cbb.js",
+    "static/js/2.49cb56b5.chunk.js",
+    "static/css/main.63c2ddc7.chunk.css",
+    "static/js/main.f0dcfa54.chunk.js"
+  ]
+}
