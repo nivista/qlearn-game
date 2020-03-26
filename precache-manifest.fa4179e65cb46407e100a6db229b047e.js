@@ -4,11 +4,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/qlearn-game/4b22d79751a1b66f2211.worker.js"
   },
   {
-    "revision": "9942fe97744850ab012c8f3c4f6c5f31",
+    "revision": "229ff5d959924365d04793a7724f96fc",
     "url": "/qlearn-game/index.html"
   },
   {
-    "revision": "ad3e137a1cc666b43f21",
+    "revision": "187598a8c2d8244583a2",
     "url": "/qlearn-game/static/css/main.63c44080.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/qlearn-game/static/js/2.84b31bd1.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "ad3e137a1cc666b43f21",
-    "url": "/qlearn-game/static/js/main.4164b08f.chunk.js"
+    "revision": "187598a8c2d8244583a2",
+    "url": "/qlearn-game/static/js/main.2ed61fa2.chunk.js"
   },
   {
     "revision": "ea186f0b746fdf94db9b",

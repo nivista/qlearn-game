@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/qlearn-game/precache-manifest.e5e07c8ebe7a198f3dd2b59ae0f98b10.js"
+  "/qlearn-game/precache-manifest.fa4179e65cb46407e100a6db229b047e.js"
 );
 
 self.addEventListener('message', (event) => {

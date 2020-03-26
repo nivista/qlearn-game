@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/qlearn-game/static/css/main.63c44080.chunk.css",
-    "main.js": "/qlearn-game/static/js/main.4164b08f.chunk.js",
-    "main.js.map": "/qlearn-game/static/js/main.4164b08f.chunk.js.map",
+    "main.js": "/qlearn-game/static/js/main.2ed61fa2.chunk.js",
+    "main.js.map": "/qlearn-game/static/js/main.2ed61fa2.chunk.js.map",
     "runtime-main.js": "/qlearn-game/static/js/runtime-main.8c624cbb.js",
     "runtime-main.js.map": "/qlearn-game/static/js/runtime-main.8c624cbb.js.map",
     "static/js/2.84b31bd1.chunk.js": "/qlearn-game/static/js/2.84b31bd1.chunk.js",
@@ -10,7 +10,7 @@
     "4b22d79751a1b66f2211.worker.js": "/qlearn-game/4b22d79751a1b66f2211.worker.js",
     "4b22d79751a1b66f2211.worker.js.map": "/qlearn-game/4b22d79751a1b66f2211.worker.js.map",
     "index.html": "/qlearn-game/index.html",
-    "precache-manifest.e5e07c8ebe7a198f3dd2b59ae0f98b10.js": "/qlearn-game/precache-manifest.e5e07c8ebe7a198f3dd2b59ae0f98b10.js",
+    "precache-manifest.fa4179e65cb46407e100a6db229b047e.js": "/qlearn-game/precache-manifest.fa4179e65cb46407e100a6db229b047e.js",
     "service-worker.js": "/qlearn-game/service-worker.js",
     "static/css/main.63c44080.chunk.css.map": "/qlearn-game/static/css/main.63c44080.chunk.css.map",
     "static/js/2.84b31bd1.chunk.js.LICENSE.txt": "/qlearn-game/static/js/2.84b31bd1.chunk.js.LICENSE.txt",
@@ -20,6 +20,6 @@
     "static/js/runtime-main.8c624cbb.js",
     "static/js/2.84b31bd1.chunk.js",
     "static/css/main.63c44080.chunk.css",
-    "static/js/main.4164b08f.chunk.js"
+    "static/js/main.2ed61fa2.chunk.js"
   ]
 }
