@@ -1,5 +1,12 @@
 import { RED_COST, GREEN_REWARD, DISCOUNT, LEARNING_RATE } from "./constants";
 
+/* Given an array of objects grid, and an intended direction integer from 0-3
+ * representing left, up, right, or down, a costOfLiving representing base changes
+ * change in reward for each move and a failRate indicating likelihood of
+ * turning left or right unintentionally
+ * Returns the agents nextLocation, the change in reward, the updated qval,
+ * and whether or not it was gameover
+ */
 export const move = (grid, intendedDir, agentLoc, costOfLiving, failRate) => {
   const rand = Math.random();
   let dir = intendedDir;
@@ -48,11 +55,11 @@ export const move = (grid, intendedDir, agentLoc, costOfLiving, failRate) => {
       nextLoc = agentLoc;
       nextLocReward = Math.max(...grid[nextLoc[0]][nextLoc[1]].qVals);
       break;
-    case "reward": //change reward accordingly
+    case "reward":
       changeInReward += GREEN_REWARD;
       gameover = true;
       break;
-    case "cost": //change reward accordingly
+    case "cost":
       changeInReward += RED_COST;
       gameover = true;
       break;
@@ -60,14 +67,36 @@ export const move = (grid, intendedDir, agentLoc, costOfLiving, failRate) => {
   }
 
   if (gameover) {
-    nextLoc = [0, 0]; // move back home
-    nextLocReward = 0; // new "life" starting, don't keep track of reward
+    nextLoc = [0, 0];
+    nextLocReward = 0;
   }
 
-  // update q vals, given a grid, agent location, selected move, and reward
-  const prevQ = grid[agentLoc[0]][agentLoc[1]].qVals[intendedDir]; //prevQ
+  const prevQ = grid[agentLoc[0]][agentLoc[1]].qVals[intendedDir];
 
   const proposedQ = changeInReward + (1 - DISCOUNT) * nextLocReward;
   const newQ = prevQ * (1 - LEARNING_RATE) + proposedQ * LEARNING_RATE;
   return { nextLoc, newQ, changeInReward, gameover };
 };
+
+/* Takes a 2d array of objects grid and array agent ([row,col])
+ * With probability exploitProb returns a best direction based on qvals
+ * Otherwise returns a random move
+ */
+export function chooseMove(grid, agent, exploitProb) {
+  if (Math.random() < exploitProb) {
+    // best move
+    let square = grid[agent[0]][agent[1]];
+    let max = Math.max(...square.qVals);
+    let options = [];
+
+    square.qVals.forEach((val, i) => {
+      if (val === max) {
+        options.push(i);
+      }
+    });
+    return options[Math.floor(Math.random() * options.length)];
+  } else {
+    // explore
+    return Math.floor(Math.random() * 4);
+  }
+}

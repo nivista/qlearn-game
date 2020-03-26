@@ -1,8 +1,7 @@
 import React from "react";
 import "./ControlPanel.css";
 import { COST_OF_LIVING_DEFAULT, FAIL_RATE_DEFAULT, MODES } from "./constants";
-//we want a way to select, play, train, or both
-//use react controlled elements
+
 class ControlPanel extends React.Component {
   constructor(props) {
     super(props);

@@ -5,20 +5,17 @@ import {
   FAIL_RATE_DEFAULT,
   ROWS,
   COLS,
-  MODES
+  MODES,
+  EPSILON
 } from "./constants";
 import "./App.css";
 import Grid from "./Grid";
 import ControlPanel from "./ControlPanel";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import Worker from "worker-loader!./worker.js";
-import { move } from "./gameLogic";
+import { move, chooseMove } from "./gameLogic";
 
 class App extends React.Component {
-  /*
-   * Initializes state
-   * Creates ref
-   */
   constructor(props) {
     super(props);
     const agent = [0, 0];
@@ -58,16 +55,13 @@ class App extends React.Component {
     });
   }
 
-  /*
-   * Focuses on main app div
-   */
+  // focuses on grid
   focusDiv = () => {
     this.myRef.current.focus();
   };
 
-  /* given row/col of gridSquare, changes its type
-   * (normal -> wall -> reward -> cost -> normal)
-   */
+  // given row/col of gridSquare, changes its type
+  // (normal -> wall -> reward -> cost -> normal)
   switchType = (row, col) => {
     const newGrid = this.state.grid.slice();
     newGrid[row] = newGrid[row].slice();
@@ -89,9 +83,8 @@ class App extends React.Component {
     this.setState({ grid: newGrid });
   };
 
-  /* Does nothing if mode === "train" or arrow keys weren't pressed
-   * calls moveagent with direction given by arrowkeys and newspot Given
-   * by getNextSpot
+  /* Does nothing in HUMAN_PLAY mode or if arrow keys weren't pressed
+   * otherwise does move indicated by arrow keys and updates state
    */
   handleKeyDown = e => {
     if (
@@ -113,11 +106,8 @@ class App extends React.Component {
     this.updateState(dir, nextLoc, newQ, changeInReward, gameover);
   };
 
-  /* if applicable, changes mode
-   * stops all intervals and workers
-   * if the mode is "train" initializes botInterval
-   * if the mode is "both" tells worker to train in the background
-   */
+  // if passed mode is different then current mode, changes mode, clearsIntervals
+  // and starts a interval for bot movement if mode is BOT_TRAIN or BOT_PLAY
   setMode = mode => {
     if (this.state.mode === mode) return;
     clearInterval(this.state.botInterval);
@@ -132,27 +122,12 @@ class App extends React.Component {
     this.setState({ mode: mode, botInterval: botInterval });
   };
 
-  /* Executes move by bot and updates state
-   * updates q values
-   */
+  //Executes move by bot and updates state
+  //updates q values
   botMove = () => {
-    let dir;
-    if (Math.random() < 0.8 || this.state.mode === MODES.BOT_PLAY) {
-      // best move
-      let square = this.state.grid[this.state.agent[0]][this.state.agent[1]];
-      let max = Math.max(...square.qVals);
-      let options = [];
+    let exploitProb = this.state.mode === MODES.BOT_TRAIN ? EPSILON : 1;
+    let dir = chooseMove(this.state.grid, this.state.agent, exploitProb);
 
-      square.qVals.forEach((val, i) => {
-        if (val === max) {
-          options.push(i);
-        }
-      });
-      dir = options[Math.floor(Math.random() * options.length)];
-    } else {
-      // explore
-      dir = Math.floor(Math.random() * 4);
-    }
     const { nextLoc, newQ, changeInReward, gameover } = move(
       this.state.grid,
       dir,

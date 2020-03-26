@@ -11,4 +11,5 @@ export const MODES = Object.freeze({
   BOT_PLAY: "Bot Play",
   BOT_TRAIN: "Bot Train"
 });
-export const DISPLAY_Q_VALUES = true;
+export const DISPLAY_Q_VALUES = false;
+export const EPSILON = 0.8;
