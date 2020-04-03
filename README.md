@@ -1,6 +1,6 @@
 # Welcome to QLearn
 
-QLearn is a game that that can be controlled by an AI trained with Q-learning
+QLearn is a game that that can be controlled by an AI trained with Q-learning. Check it out [here](https://nivista.github.io/qlearn-game/).
 
 ### What is Q-learning?
 
